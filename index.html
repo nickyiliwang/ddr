@@ -11,6 +11,7 @@
         width: 300px;
         border: 1px solid red;
         margin: 0 auto;
+        position: relative;
       }
       .movingPiece {
         text-align: center;
@@ -21,30 +22,93 @@
         display: block;
         margin: 0 auto;
       }
+      .hotZone {
+        height: 100px;
+        background: lightgrey;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: -1;
+      }
+      .late {
+        height: 50px;
+        background: red;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: -1;
+      }
     </style>
   </head>
   <body>
     <div class="gameCanvas">
       <p class="movingPiece">A</p>
+      <div class="hotZone"></div>
+      <div class="late"></div>
     </div>
 
     <button class="reset">RESET</button>
 
     <script>
-      setInterval(() => {
-        const piece = document.querySelector(".movingPiece");
-        const currentPos = window.getComputedStyle(piece).marginTop;
+      const piece = document.querySelector(".movingPiece");
+      let gameLoginInterval;
+      let currentPos;
+      const gameLogic = () => {
+        currentPos = parseInt(window.getComputedStyle(piece).marginTop);
+        if (currentPos !== 500) {
+          piece.style.marginTop = `${currentPos + 5}px`;
+        } else {
+          clearInterval(gameLoginInterval);
+          piece.textContent = "S";
+          piece.style.marginTop = `0px`;
+          gameBegin();
+        }
+      };
 
-        let pieceMargin = piece.style.marginTop = 
-
-        // console.log(pieceMargin);
-      }, 50);
+      let gameBegin = () => {
+        gameLoginInterval = setInterval(gameLogic, 20);
+      };
 
       document.addEventListener("keydown", event => {
-        if (event.isComposing || event.keyCode === 65) {
-          console.log("a");
+        switch (event.keyCode) {
+          case 65:
+            console.log(currentPos);
+            if (currentPos === 400) {
+              console.log("poggers");
+            } else if (currentPos > 400 || currentPos >= 450) {
+              console.log("hotzone");
+            } else {
+              console.log("early or late");
+            }
+
+            console.log("a");
+            piece.style.marginTop = `0px`;
+            break;
+          case 83:
+            console.log("s");
+            piece.style.marginTop = `0px`;
+            break;
+          case 68:
+            console.log("d");
+            piece.style.marginTop = `0px`;
+            break;
+          case 32:
+            console.log("paused");
+            if (gameLoginInterval) {
+              clearInterval(gameLoginInterval);
+              gameLoginInterval = null;
+            } else {
+              gameBegin();
+            }
+            break;
+          default:
+            break;
         }
       });
+
+      gameBegin();
     </script>
   </body>
 </html>
