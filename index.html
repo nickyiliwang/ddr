@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <style>
+      .gameCanvas {
+        height: 500px;
+        width: 300px;
+        border: 1px solid red;
+        margin: 0 auto;
+      }
+      .movingPiece {
+        text-align: center;
+        padding: 0;
+        margin: 0;
+      }
+      .reset {
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gameCanvas">
+      <p class="movingPiece">A</p>
+    </div>
+
+    <button class="reset">RESET</button>
+
+    <script>
+      setInterval(() => {
+        const piece = document.querySelector(".movingPiece");
+        const currentPos = window.getComputedStyle(piece).marginTop;
+
+        let pieceMargin = piece.style.marginTop = 
+
+        // console.log(pieceMargin);
+      }, 50);
+
+      document.addEventListener("keydown", event => {
+        if (event.isComposing || event.keyCode === 65) {
+          console.log("a");
+        }
+      });
+    </script>
+  </body>
+</html>
