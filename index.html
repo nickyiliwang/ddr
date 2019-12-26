@@ -6,6 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Document</title>
     <style>
+      .wrapper {
+        max-width: 1440;
+        width: 80%;
+        margin: 0 auto;
+      }
+      header {
+        margin-top: 10vh;
+      }
       .gameCanvas {
         height: 500px;
         width: 300px;
@@ -17,10 +25,13 @@
         text-align: center;
         padding: 0;
         margin: 0;
+        font-size: 30px;
       }
-      .reset {
-        display: block;
-        margin: 0 auto;
+      .info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
       }
       .hotZone {
         height: 100px;
@@ -43,70 +54,143 @@
     </style>
   </head>
   <body>
-    <div class="gameCanvas">
-      <p class="movingPiece">A</p>
-      <div class="hotZone"></div>
-      <div class="late"></div>
-    </div>
-
-    <button class="reset">RESET</button>
+    <header>
+      <div class="wrapper">
+        <div class="gameCanvas">
+          <p class="movingPiece">UP</p>
+          <div class="hotZone"></div>
+          <div class="late"></div>
+        </div>
+        <div class="info">
+          <label>
+            Score:<input type="number" class="showScore" value="0" disabled />
+          </label>
+          <label>
+            Health:<input
+              type="number"
+              class="showHealth"
+              value="100"
+              disabled
+            />
+          </label>
+          <button class="reset">RESET</button>
+        </div>
+      </div>
+    </header>
 
     <script>
       const piece = document.querySelector(".movingPiece");
+      const showScore = document.querySelector(".showScore");
+      const showHealth = document.querySelector(".showHealth");
+      const resetBtn = document.querySelector(".reset");
+      let letters = ["UP", "DOWN", "LEFT", "RIGHT"];
       let gameLoginInterval;
       let currentPos;
+      let score = 0;
+      let health = 100;
+      let lastInput = "";
       const gameLogic = () => {
         currentPos = parseInt(window.getComputedStyle(piece).marginTop);
         if (currentPos !== 500) {
           piece.style.marginTop = `${currentPos + 5}px`;
+        } else if (currentPos > 490 && lastInput === "") {
+          health--;
+          showHealth.value = health;
+          getNewArrow();
         } else {
-          clearInterval(gameLoginInterval);
-          piece.textContent = "S";
-          piece.style.marginTop = `0px`;
-          gameBegin();
+          getNewArrow();
         }
+      };
+
+      const getRandomArrow = () => {
+        let randomNumber = Math.floor(
+          Math.random() * Math.floor(letters.length - 1)
+        );
+        return letters[randomNumber];
+      };
+
+      const getNewArrow = () => {
+        clearInterval(gameLoginInterval);
+        piece.textContent = getRandomArrow();
+        piece.style.marginTop = `0px`;
+        lastInput = "";
+        gameBegin();
       };
 
       let gameBegin = () => {
         gameLoginInterval = setInterval(gameLogic, 20);
       };
 
-      document.addEventListener("keydown", event => {
-        switch (event.keyCode) {
-          case 65:
-            console.log(currentPos);
-            if (currentPos === 400) {
-              console.log("poggers");
-            } else if (currentPos > 400 || currentPos >= 450) {
-              console.log("hotzone");
-            } else {
-              console.log("early or late");
-            }
+      const checkForScore = letter => {
+        if (piece.textContent === letter) {
+          if (currentPos === 400) {
+            console.log("poggers");
+            score += 2;
+          } else if (currentPos > 400 && currentPos <= 450) {
+            console.log("hotzone");
+            score++;
+            console.log(score);
+            showScore.value = score;
+          } else if (currentPos < 400) {
+            console.log("early");
+            health--;
+            showHealth.value = health;
+          } else if (currentPos > 450) {
+            console.log("late");
+            health--;
+            showHealth.value = health;
+          }
+        } else {
+          health--;
+          showHealth.value = health;
+        }
+        piece.textContent = getRandomArrow();
+        lastInput = "";
+        piece.style.marginTop = `0px`;
+      };
 
-            console.log("a");
-            piece.style.marginTop = `0px`;
+      document.addEventListener("keydown", event => {
+        if (event.code === 32) {
+          if (gameLoginInterval) {
+            clearInterval(gameLoginInterval);
+            gameLoginInterval = null;
+          } else {
+            gameBegin();
+          }
+        }
+
+        switch (event.keyCode) {
+          // up
+          case 38:
+            lastInput = "UP";
+            checkForScore("UP");
             break;
-          case 83:
-            console.log("s");
-            piece.style.marginTop = `0px`;
+          // down
+          case 40:
+            lastInput = "DOWN";
+            checkForScore("DOWN");
             break;
-          case 68:
-            console.log("d");
-            piece.style.marginTop = `0px`;
+          // left
+          case 37:
+            lastInput = "LEFT";
+            checkForScore("LEFT");
             break;
-          case 32:
-            console.log("paused");
-            if (gameLoginInterval) {
-              clearInterval(gameLoginInterval);
-              gameLoginInterval = null;
-            } else {
-              gameBegin();
-            }
+          // right
+          case 39:
+            lastInput = "RIGHT";
+            checkForScore("RIGHT");
             break;
           default:
             break;
         }
       });
+
+      const resetGame = () => {
+        score = 0;
+        health = 100;
+      };
+
+      resetBtn.addEventListener("click", resetGame);
 
       gameBegin();
     </script>
